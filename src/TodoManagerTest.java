@@ -31,7 +31,7 @@ class TodoManagerTest {
 
     @Test
     public void testForUpdatingTodoWithInvalidId() {
-        Todo todo = new Todo("Go to Bangalore", "travel", Arrays.asList("fun", "party"), false);
+        Todo todo = new Todo("Go to chennai", "travel", Arrays.asList("office", "work"), false);
         todoManager.add(todo);
         assertThrows(InvalidIdException.class, () -> todoManager.updateTodo(10, "drawing"));
     }
@@ -66,5 +66,4 @@ class TodoManagerTest {
             }
         }
     }
-
 }
