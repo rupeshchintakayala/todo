@@ -2,7 +2,7 @@ import java.util.*;
 
 public class TodoConsole {
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws InvalidIdException {
         int choice;
         Scanner sc = new Scanner(System.in);
         String str;
@@ -31,7 +31,8 @@ public class TodoConsole {
                     System.out.println("Enter tags using comma's");
                     line = sc.nextLine();
                     tag = Arrays.asList(line.split(","));
-                    todoManager.add(act, cat, tag);
+                    Todo todo=new Todo(act,cat,tag,false);
+                    todoManager.add(todo);
                     break;
                 case 2:
                     todoManager.displayAll();

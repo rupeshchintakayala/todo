@@ -10,10 +10,10 @@ class TodoManager {
     private Map<String, Integer> catNameId = new HashMap<>();
     private Map<Integer, Todo> idToTodoMap = new HashMap<>();
 
-    void add(String act, String cat, List<String> tag) {
-        Todo todo = new Todo(actionIdCounter, act, cat, tag, false);
+    void add(Todo todo) {
+        todo.setId(actionIdCounter);
         idToTodoMap.put(actionIdCounter, todo);
-        for (String tagName : tag) {
+        for (String tagName : todo.getTags()) {
             if (tagNameId.containsKey(tagName)) {
                 int tagId = tagNameId.get(tagName);
                 List<Integer> temp = tagIdActionId.get(tagId);
@@ -26,15 +26,14 @@ class TodoManager {
                 tagIdActionId.put(tagIdCounter, temp);
                 tagIdCounter++;
             }
-
         }
-        if (catNameId.containsKey(cat)) {
-            int index = catNameId.get(cat);
+        if (catNameId.containsKey(todo.getCategory())) {
+            int index = catNameId.get(todo.getCategory());
             List<Integer> temp = catIdActionId.get(index);
             temp.add(actionIdCounter);
             catIdActionId.put(index, temp);
         } else {
-            catNameId.put(cat, categoryIdCounter);
+            catNameId.put(todo.getCategory(), categoryIdCounter);
             List<Integer> temp = new ArrayList<>();
             temp.add(actionIdCounter);
             catIdActionId.put(categoryIdCounter, temp);
@@ -69,8 +68,7 @@ class TodoManager {
         }
     }
 
-    String displayUsingTags(String tag) {
-        String result=" ";
+    void displayUsingTags(String tag) {
         if (tagNameId.containsKey(tag)) {
             for (Integer i : tagIdActionId.get(tagNameId.get(tag))) {
                 if (idToTodoMap.get(i) != null) {
@@ -79,15 +77,17 @@ class TodoManager {
             }
         } else {
             System.out.println("No action found related to this tag " + tag);
-            result="No action found related to this tag " + tag;
         }
-        return result;
     }
 
     void displayAll() {
         for (Todo todo : idToTodoMap.values()) {
             System.out.println(todo.getId() + "\t\t" + todo.getAction() + "\t\t" + todo.getCategory() + "\t\t" + todo.getTags());
         }
+    }
+
+    Collection<Todo> getTodos(){
+        return idToTodoMap.values();
     }
 
     void completedTodo(int id) {
