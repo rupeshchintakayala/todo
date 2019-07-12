@@ -2,7 +2,7 @@ import java.util.*;
 
 public class TodoConsole {
 
-    public static void main(String[] args) throws InvalidIdException {
+    public static void main(String[] args){
         int choice;
         Scanner sc = new Scanner(System.in);
         String str;
