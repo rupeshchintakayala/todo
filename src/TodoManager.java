@@ -1,9 +1,9 @@
 import java.util.*;
 
 class TodoManager {
-    private static int actionIdCounter = 0;
-    private static int categoryIdCounter = 500;
-    private static int tagIdCounter = 1000;
+    private int actionIdCounter = 0;
+    private int categoryIdCounter = 500;
+    private int tagIdCounter = 1000;
     private Map<Integer, List<Integer>> tagIdActionId = new HashMap<>();
     private Map<Integer, List<Integer>> catIdActionId = new HashMap<>();
     private Map<String, Integer> tagNameId = new HashMap<>();
