@@ -69,7 +69,8 @@ class TodoManager {
         }
     }
 
-    void displayUsingTags(String tag) {
+    String displayUsingTags(String tag) {
+        String result=" ";
         if (tagNameId.containsKey(tag)) {
             for (Integer i : tagIdActionId.get(tagNameId.get(tag))) {
                 if (idToTodoMap.get(i) != null) {
@@ -77,9 +78,10 @@ class TodoManager {
                 }
             }
         } else {
-            System.out.println("No action found related to this tag:\t" + tag);
+            System.out.println("No action found related to this tag " + tag);
+            result="No action found related to this tag " + tag;
         }
-
+        return result;
     }
 
     void displayAll() {
