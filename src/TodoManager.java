@@ -10,7 +10,7 @@ class TodoManager {
     private Map<String, Integer> catNameId = new HashMap<>();
     private Map<Integer, Todo> idToTodoMap = new HashMap<>();
 
-    void add(Todo todo) {
+    Todo add(Todo todo) {
         todo.setId(actionIdCounter);
         idToTodoMap.put(actionIdCounter, todo);
         for (String tagName : todo.getTags()) {
@@ -40,6 +40,7 @@ class TodoManager {
             categoryIdCounter++;
         }
         actionIdCounter++;
+        return todo;
     }
 
     void updateTodo(int id, String action) throws InvalidIdException {

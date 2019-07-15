@@ -1,4 +1,3 @@
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -11,22 +10,30 @@ class TodoManagerTest {
     @Test
     public void testForAddingTodo() {
         Todo todo = new Todo("Go to chennai", "travel", Arrays.asList("office", "work"), false);
-        todoManager.add(todo);
+        todo = todoManager.add(todo);
+        boolean match=false;
         for (Todo todo_iterator : todoManager.getTodos()) {
-            assertEquals(todo_iterator, todo);
+            if (todo.getId() == todo_iterator.getId()) {
+                match=true;
+            }
         }
+        assertTrue(match);
     }
 
     @Test
     public void testForUpdatingTodo() throws InvalidIdException {
-        Todo todo = new Todo("Go to vizag", "travel", Arrays.asList("home", "vacation"), false);
-        todoManager.add(todo);
+        Todo todo = new Todo("Go to Vizag", "travel", Arrays.asList("home", "vacation"), false);
+        todo = todoManager.add(todo);
+        boolean match=false;
         todoManager.updateTodo(0, "Go to Bangalore");
         for (Todo todo_iterator : todoManager.getTodos()) {
-            if(todo_iterator.getId()==0){
-                assertEquals(todo_iterator.getAction(), todo.getAction());
+            if (todo_iterator.getId() == (todo.getId())) {
+                if(todo_iterator.getAction().equals(todo.getAction())){
+                    match=true;
+                }
             }
         }
+        assertTrue(match);
     }
 
     @Test
@@ -44,26 +51,52 @@ class TodoManagerTest {
     }
 
     @Test
-    public void testForFindByCategory(){
-        Todo todo = new Todo("Go to Bangalore", "travel", Arrays.asList("fun", "party"), false);
-        todoManager.add(todo);
-        todoManager.displayUsingCategory(todo.getCategory());
+    public void testForDeletingTodo() throws InvalidIdException {
+        Todo todo = new Todo("Go to vizag", "travel", Arrays.asList("home", "vacation"), false);
+        todo=todoManager.add(todo);
+        todoManager.deleteTodo(0);
+        boolean match = false;
         for (Todo todo_iterator : todoManager.getTodos()) {
-            assertEquals(todo_iterator.getCategory(), todo.getCategory());
+            if(todo_iterator.getId()==todo.getId()){
+                match=true;
+            }
         }
+        assertFalse(match);
     }
 
     @Test
-    public void testForFindByTags(){
-        Todo todo = new Todo("Go to office", "life", Arrays.asList("project", "learn"), false);
-        todoManager.add(todo);
-        todoManager.displayUsingTags("work");
+    public void testForFindByCategory() {
+        Todo todo = new Todo("Go to Bangalore", "travel", Arrays.asList("fun", "party"), false);
+        todo=todoManager.add(todo);
+        boolean match=false;
+        String findByCategory="travel";
+        todoManager.displayUsingCategory(findByCategory);
         for (Todo todo_iterator : todoManager.getTodos()) {
-            for(String tag: todo_iterator.getTags()){
-                if(tag=="office"){
-                    assertEquals(tag,"office");
+            if (todo_iterator.getCategory().equals(findByCategory)) {
+                if(todo_iterator.getAction().equals(todo.getAction())){
+                    match=true;
                 }
             }
         }
+        assertTrue(match);
+    }
+
+    @Test
+    public void testForFindByTags() {
+        Todo todo = new Todo("Go to office", "life", Arrays.asList("project", "work"), false);
+        String findByTag="work";
+        todoManager.add(todo);
+        todoManager.displayUsingTags(findByTag);
+        boolean match=false;
+        for (Todo todo_iterator : todoManager.getTodos()) {
+            for (String tag : todo_iterator.getTags()) {
+                if (tag.equals(findByTag)) {
+                    if(todo_iterator.getAction().equals(todo.getAction())){
+                        match=true;
+                    }
+                }
+            }
+        }
+        assertTrue(match);
     }
 }
