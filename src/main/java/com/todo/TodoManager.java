@@ -1,16 +1,18 @@
+package com.todo;
+
 import java.util.*;
 
-class TodoManager {
+public class TodoManager {
     private int actionIdCounter = 0;
     private int categoryIdCounter = 500;
     private int tagIdCounter = 1000;
-    private Map<Integer, List<Integer>> tagIdActionId = new HashMap<>();
-    private Map<Integer, List<Integer>> catIdActionId = new HashMap<>();
-    private Map<String, Integer> tagNameId = new HashMap<>();
-    private Map<String, Integer> catNameId = new HashMap<>();
-    private Map<Integer, Todo> idToTodoMap = new HashMap<>();
+    private Map<Integer, List<Integer>> tagIdActionId = new HashMap<Integer, List<Integer>>();
+    private Map<Integer, List<Integer>> catIdActionId = new HashMap<Integer, List<Integer>>();
+    private Map<String, Integer> tagNameId = new HashMap<String, Integer>();
+    private Map<String, Integer> catNameId = new HashMap<String, Integer>();
+    private Map<Integer, Todo> idToTodoMap = new HashMap<Integer, Todo>();
 
-    Todo add(Todo todo) {
+    public Todo add(Todo todo) {
         todo.setId(actionIdCounter);
         idToTodoMap.put(actionIdCounter, todo);
         for (String tagName : todo.getTags()) {
@@ -21,7 +23,7 @@ class TodoManager {
                 tagIdActionId.put(tagId, temp);
             } else {
                 tagNameId.put(tagName, tagIdCounter);
-                List<Integer> temp = new ArrayList<>();
+                List<Integer> temp = new ArrayList<Integer>();
                 temp.add(actionIdCounter);
                 tagIdActionId.put(tagIdCounter, temp);
                 tagIdCounter++;
@@ -34,7 +36,7 @@ class TodoManager {
             catIdActionId.put(index, temp);
         } else {
             catNameId.put(todo.getCategory(), categoryIdCounter);
-            List<Integer> temp = new ArrayList<>();
+            List<Integer> temp = new ArrayList<Integer>();
             temp.add(actionIdCounter);
             catIdActionId.put(categoryIdCounter, temp);
             categoryIdCounter++;
@@ -43,25 +45,25 @@ class TodoManager {
         return todo;
     }
 
-    void updateTodo(int id, String action) throws InvalidIdException {
+    public void updateTodo(int id, String action) throws InvalidIdException {
         if (!idToTodoMap.containsKey(id)) {
             throw new InvalidIdException("Enter a valid todo id");
         }
         idToTodoMap.get(id).setAction(action);
     }
 
-    void deleteTodo(int id) throws InvalidIdException {
+    public void deleteTodo(int id) throws InvalidIdException {
         if (!idToTodoMap.containsKey(id)) {
             throw new InvalidIdException("Enter a valid todo id");
         }
         idToTodoMap.remove(id);
     }
 
-    void displayUsingCategory(String category) {
+    public void displayUsingCategory(String category) {
         if (catNameId.containsKey(category)) {
             for (Integer i : catIdActionId.get(catNameId.get(category))) {
                 if (idToTodoMap.get(i) != null) {
-                    System.out.println(idToTodoMap.get(i));
+                    System.out.println(idToTodoMap.get(i).getAction());
                 }
             }
         } else {
@@ -69,11 +71,11 @@ class TodoManager {
         }
     }
 
-    void displayUsingTags(String tag) {
+    public void displayUsingTags(String tag) {
         if (tagNameId.containsKey(tag)) {
             for (Integer i : tagIdActionId.get(tagNameId.get(tag))) {
                 if (idToTodoMap.get(i) != null) {
-                    System.out.println(idToTodoMap.get(i));
+                    System.out.println(idToTodoMap.get(i).getAction());
                 }
             }
         } else {
@@ -87,7 +89,7 @@ class TodoManager {
         }
     }
 
-    Collection<Todo> getTodos(){
+    public Collection<Todo> getTodos() {
         return idToTodoMap.values();
     }
 

@@ -1,3 +1,5 @@
+package com.todo;
+
 import java.util.*;
 
 public class TodoConsole {
@@ -16,7 +18,7 @@ public class TodoConsole {
             System.out.println("3) Delete Todo");
             System.out.println("4) Check an Action");
             System.out.println("5) Display Todo using Category");
-            System.out.println("6) Display Todo using todos Tag");
+            System.out.println("6) Display Todo using Tag");
             System.out.println("7) View Completed actions");
             System.out.println("8) Display all actions");
             choice = sc.nextInt();
@@ -31,7 +33,7 @@ public class TodoConsole {
                     System.out.println("Enter tags using comma's");
                     line = sc.nextLine();
                     tag = Arrays.asList(line.split(","));
-                    Todo todo=new Todo(act,cat,tag,false);
+                    Todo todo = new Todo(act, cat, tag, false);
                     todoManager.add(todo);
                     break;
                 case 2:
