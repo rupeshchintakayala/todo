@@ -3,7 +3,7 @@ package com.todo;
 import java.util.*;
 
 public class TodoManager {
-    private int actionIdCounter = 0;
+    private int actionIdCounter;
     private int categoryIdCounter = 500;
     private int tagIdCounter = 1000;
     private Map<Integer, List<Integer>> tagIdActionId = new HashMap<Integer, List<Integer>>();
@@ -12,8 +12,12 @@ public class TodoManager {
     private Map<String, Integer> catNameId = new HashMap<String, Integer>();
     private Map<Integer, Todo> idToTodoMap = new HashMap<Integer, Todo>();
 
+    public void setActionIdCounter(int actionIdCounter) {
+        this.actionIdCounter = actionIdCounter;
+    }
+
     public Todo add(Todo todo) {
-        todo.setId(actionIdCounter);
+        actionIdCounter=todo.getId();
         idToTodoMap.put(actionIdCounter, todo);
         for (String tagName : todo.getTags()) {
             if (tagNameId.containsKey(tagName)) {
@@ -41,7 +45,6 @@ public class TodoManager {
             catIdActionId.put(categoryIdCounter, temp);
             categoryIdCounter++;
         }
-        actionIdCounter++;
         return todo;
     }
 

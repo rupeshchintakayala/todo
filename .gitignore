@@ -2,3 +2,6 @@
 */production/
 *.iml
 .idea/
+src/main/java/com/todo/test.db
+target/*
+test.db
