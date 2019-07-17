@@ -7,18 +7,18 @@ import java.util.Scanner;
 
 public class TodoConsole {
 
-    public static void main(String[] args) throws InvalidIdException, SQLException {
+    public static void main(String[] args) throws SQLException {
         int choice;
         Scanner sc = new Scanner(System.in);
         String str;
         int index;
         String line;
         TodoManager todoManager = new TodoManager();
-        TodoDataBase todoDataBase=new TodoDataBase();
-//        todoDataBase.dropTable();
-        todoDataBase.connectToDatabase();
-        todoDataBase.createNewTable();
-        todoDataBase.showTable();
+        TodoTable todoTable =new TodoTable();
+        todoTable.dropTable();
+        todoTable.connectToDatabase();
+        todoTable.createNewTable();
+        todoTable.showTable();
         while (true) {
             System.out.println("Choose an action");
             System.out.println("1) Add Todo");
@@ -41,7 +41,7 @@ public class TodoConsole {
                     System.out.println("Enter tags using comma's");
                     line = sc.nextLine();
                     tag = Arrays.asList(line.split(","));
-                    int id=todoDataBase.insertValuesToDatabase(act,cat,line);
+                    int id= todoTable.insertValuesToDatabase(act,cat,tag);
                     Todo todo = new Todo(act, cat, tag, false);
                     todo.setId(id);
                     todoManager.add(todo);
@@ -53,7 +53,7 @@ public class TodoConsole {
                     sc.nextLine();
                     System.out.println("Enter the new Action: \t");
                     str = sc.nextLine();
-                    todoDataBase.updateTodo(index,str);
+                    todoTable.updateTodo(index,str);
                     try {
                         todoManager.updateTodo(index, str);
                     } catch (InvalidIdException e) {
@@ -71,7 +71,7 @@ public class TodoConsole {
                     } catch (InvalidIdException e) {
                         System.out.println(e.toString());
                     }
-                    todoDataBase.deleteTodo(index);
+                    todoTable.deleteTodo(index);
                     break;
                 case 4:
                     System.out.println("Enter index of action to check");
@@ -79,15 +79,15 @@ public class TodoConsole {
                     todoManager.completedTodo(index);
                     break;
                 case 5:
-                    System.out.println("Enter todos category: \t");
+                    System.out.println("Enter todo category: \t");
                     str = sc.nextLine();
-                    todoDataBase.findByCategory(str);
+                    todoTable.findByCategory(str);
                     todoManager.displayUsingCategory(str);
                     break;
                 case 6:
-                    System.out.println("Enter todos tag: \t");
+                    System.out.println("Enter todo tag: \t");
                     str = sc.nextLine();
-                    todoDataBase.findByTag(str);
+                    todoTable.findByTag(str);
                     todoManager.displayUsingTags(str);
                     break;
                 case 7:
@@ -98,7 +98,8 @@ public class TodoConsole {
                     System.out.println("Program-");
                     todoManager.displayAll();
                     System.out.println("Database-");
-                    todoDataBase.showTable();
+                    todoTable.showTable();
+                    todoTable.showTags();
                     break;
                 default:
                     System.out.println("Enter a valid number between 1-8");

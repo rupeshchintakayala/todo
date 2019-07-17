@@ -1,6 +1,6 @@
 package com.todo;
 
-public class InvalidIdException extends Exception {
+class InvalidIdException extends Exception {
     private String exception;
 
     InvalidIdException(String exception) {

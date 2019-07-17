@@ -2,7 +2,7 @@ package com.todo;
 
 import java.util.*;
 
-public class Todo {
+class Todo {
     private int id;
     private String action;
     private String categoryName;

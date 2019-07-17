@@ -2,8 +2,7 @@ package com.todo;
 
 import java.util.*;
 
-public class TodoManager {
-    private int actionIdCounter;
+class TodoManager {
     private int categoryIdCounter = 500;
     private int tagIdCounter = 1000;
     private Map<Integer, List<Integer>> tagIdActionId = new HashMap<Integer, List<Integer>>();
@@ -12,12 +11,8 @@ public class TodoManager {
     private Map<String, Integer> catNameId = new HashMap<String, Integer>();
     private Map<Integer, Todo> idToTodoMap = new HashMap<Integer, Todo>();
 
-    public void setActionIdCounter(int actionIdCounter) {
-        this.actionIdCounter = actionIdCounter;
-    }
-
-    public Todo add(Todo todo) {
-        actionIdCounter=todo.getId();
+    Todo add(Todo todo) {
+        int actionIdCounter = todo.getId();
         idToTodoMap.put(actionIdCounter, todo);
         for (String tagName : todo.getTags()) {
             if (tagNameId.containsKey(tagName)) {
@@ -48,21 +43,21 @@ public class TodoManager {
         return todo;
     }
 
-    public void updateTodo(int id, String action) throws InvalidIdException {
+    void updateTodo(int id, String action) throws InvalidIdException {
         if (!idToTodoMap.containsKey(id)) {
             throw new InvalidIdException("Enter a valid todo id");
         }
         idToTodoMap.get(id).setAction(action);
     }
 
-    public void deleteTodo(int id) throws InvalidIdException {
+    void deleteTodo(int id) throws InvalidIdException {
         if (!idToTodoMap.containsKey(id)) {
             throw new InvalidIdException("Enter a valid todo id");
         }
         idToTodoMap.remove(id);
     }
 
-    public void displayUsingCategory(String category) {
+    void displayUsingCategory(String category) {
         if (catNameId.containsKey(category)) {
             for (Integer i : catIdActionId.get(catNameId.get(category))) {
                 if (idToTodoMap.get(i) != null) {
@@ -74,7 +69,7 @@ public class TodoManager {
         }
     }
 
-    public void displayUsingTags(String tag) {
+    void displayUsingTags(String tag) {
         if (tagNameId.containsKey(tag)) {
             for (Integer i : tagIdActionId.get(tagNameId.get(tag))) {
                 if (idToTodoMap.get(i) != null) {
@@ -92,7 +87,7 @@ public class TodoManager {
         }
     }
 
-    public Collection<Todo> getTodos() {
+    Collection<Todo> getTodos() {
         return idToTodoMap.values();
     }
 

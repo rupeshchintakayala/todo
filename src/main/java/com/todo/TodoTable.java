@@ -1,11 +1,11 @@
 package com.todo;
 
 import java.sql.*;
+import java.util.List;
 
-class TodoDataBase {
+class TodoTable {
     private String url = "jdbc:sqlite:test.db";
-    private Connection connection = null;
-
+    private Connection connection;
     void connectToDatabase() {
         try {
             connection = DriverManager.getConnection(url);
@@ -24,43 +24,67 @@ class TodoDataBase {
     }
 
     void createNewTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS todoDatabase (\n"
+        String sql = "CREATE TABLE IF NOT EXISTS todo (\n"
                 + " id integer PRIMARY KEY,\n"
                 + " action text NOT NULL,\n"
-                + " category text,\n"
-                + " tags text\n"
+                + " category text\n"
                 + ");";
-
+        String sqlForTagTable="CREATE TABLE IF NOT EXISTS tagTable (\n"
+                +" id integer,\n"
+                +" tag text\n"
+                +");";
         try {
             connection=DriverManager.getConnection(url);
             Statement statement = connection.createStatement();
             statement.execute(sql);
+            statement.execute(sqlForTagTable);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    int insertValuesToDatabase(String action, String category, String tags) throws SQLException {
+    int insertValuesToDatabase(String action, String category, List<String> tags) throws SQLException {
         connection=DriverManager.getConnection(url);
-        String statement = "INSERT INTO todos (action,category,tags) VALUES (?,?,?)";
+        String statement = "INSERT INTO todo (action,category) VALUES (?,?)";
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
         preparedStatement.setString(1, action);
         preparedStatement.setString(2, category);
-        preparedStatement.setString(3, tags);
         preparedStatement.executeUpdate();
         ResultSet rs = preparedStatement.getGeneratedKeys();
-        int id=0;
+        int todoid=0;
         if (rs.next()){
-            id=rs.getInt(1);
+            todoid=rs.getInt(1);
         }
-        return id;
+        for(String tag:tags){
+            statement = "INSERT INTO tagTable (todoid,tag) VALUES (?,?)";
+            preparedStatement = connection.prepareStatement(statement);
+            preparedStatement.setInt(1, todoid);
+            preparedStatement.setString(2, tag);
+            preparedStatement.executeUpdate();
+        }
+        return todoid;
     }
-
 
     void showTable() throws SQLException {
         connection=DriverManager.getConnection(url);
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT * from todoDatabase");
+        ResultSet resultSet = statement.executeQuery("SELECT * from todo");
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        int columnsNumber = resultSetMetaData.getColumnCount();
+        while (resultSet.next()) {
+            for (int i = 1; i <= columnsNumber; i++) {
+                String columnValue = resultSet.getString(i);
+                System.out.print(columnValue + "\t\t");
+            }
+            System.out.println("");
+        }
+    }
+
+    void showTags() throws SQLException {
+        connection=DriverManager.getConnection(url);
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * from tagTable");
+        System.out.println("Tags Table");
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         int columnsNumber = resultSetMetaData.getColumnCount();
         while (resultSet.next()) {
@@ -74,7 +98,7 @@ class TodoDataBase {
 
     void dropTable() throws SQLException {
         connection=DriverManager.getConnection(url);
-        String sql = "DROP TABLE todoDatabase;";
+        String sql = "DROP TABLE todo;";
         try {
             Statement stmt = connection.createStatement();
             stmt.execute(sql);
@@ -85,18 +109,15 @@ class TodoDataBase {
 
     void deleteTodo(int id) throws SQLException {
         connection=DriverManager.getConnection(url);
-        String sql = "DELETE FROM todoDatabase WHERE id=" + id + ";";
-        try {
-            Statement statement = connection.createStatement();
-            statement.execute(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+        String statement = "DELETE FROM TODO WHERE id=?";
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        preparedStatement.setInt(1, id);
+        preparedStatement.executeUpdate();
     }
 
     void updateTodo(int id, String action) throws SQLException {
         connection=DriverManager.getConnection(url);
-        String statement = "UPDATE todoDatabase SET action=? WHERE id=?";
+        String statement = "UPDATE todo SET action=? WHERE id=?";
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
         preparedStatement.setString(1, action);
         preparedStatement.setInt(2, id);
@@ -105,7 +126,7 @@ class TodoDataBase {
 
     void findByCategory(String category) throws SQLException {
         connection=DriverManager.getConnection(url);
-        String statement = "SELECT * FROM todoDatabase WHERE category=?";
+        String statement = "SELECT * FROM todo WHERE category=?";
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
         preparedStatement.setString(1,category);
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -116,13 +137,13 @@ class TodoDataBase {
                 String columnValue = resultSet.getString(i);
                 System.out.print(columnValue + "\t\t");
             }
-            System.out.println("");
+            System.out.println();
         }
     }
 
     void findByTag(String tag) throws SQLException {
         connection=DriverManager.getConnection(url);
-        String statement = "SELECT * FROM todoDatabase WHERE tags LIKE ? OR tags LIKE ? OR tags LIKE ?";
+        String statement = "SELECT * FROM todo WHERE tags LIKE ? OR tags LIKE ? OR tags LIKE ?";
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
         preparedStatement.setString(1,tag+",%");
         preparedStatement.setString(2,"%,"+tag+",%");
@@ -135,7 +156,7 @@ class TodoDataBase {
                 String columnValue = resultSet.getString(i);
                 System.out.print(columnValue + "\t\t");
             }
-            System.out.println("");
+            System.out.println();
         }
     }
 
