@@ -1,6 +1,7 @@
 package com.todo;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -10,26 +11,12 @@ public class TodoConsole {
     public static void main(String[] args) throws SQLException {
         int choice;
         Scanner sc = new Scanner(System.in);
-        String str;
+        String input;
         int index;
+        Todo todo;
         TodoManager todoManager = new TodoManager();
-        TodoTable todoTable=new TodoTable();
-
-        todoTable.dropTable("todoTable");
-        todoTable.dropTable("tagTable");
-        todoTable.dropTable("categoryTable");
-        todoTable.dropTable("todoIdTagId");
-
-        todoTable.connectToDatabase();
-
-        todoTable.createTodoTable();
-        todoTable.createTagTable();
-        todoTable.createCategoryTable();
-        todoTable.createTodoIdTagIdTable();
-
-        todoTable.existingCategories();
-        todoTable.existingTags();
-
+        TodoStore todoStore = new TodoStore();
+        System.out.println(todoStore.initialize());
         while (true) {
             System.out.println("Choose an action");
             System.out.println("1) Add Todo");
@@ -44,75 +31,108 @@ public class TodoConsole {
             sc.nextLine();
             switch (choice) {
                 case 1:
-                    String cat="";
-                    int todoId=0;
-                    int catId=0;
-                    int tagId=0;
+                    String categoryName = " ";
+                    int catId = 0;
+                    List<String> tagList;
+                    List<String> tagNameList;
+                    List<Integer> tagIdList;
+                    //Enter Action
                     System.out.println("Enter the action");
                     String act = sc.nextLine();
+
+                    //Enter Category
                     System.out.println("Enter:\n1 to choose from existing categories\n2 to enter new category");
-                    int choiceForCategory=sc.nextInt();
+                    int choiceForCategory = sc.nextInt();
                     sc.nextLine();
-                    if(choiceForCategory==1){
-                        todoTable.displayExistingCategories();
-                        catId=sc.nextInt();
+                    if (choiceForCategory == 1) {
+                        List<String> categoryList = todoStore.displayExistingCategories();
+                        for (String category : categoryList) {
+                            System.out.println(category);
+                        }
+                        catId = sc.nextInt();
+                        categoryName = todoStore.getCategory(catId);
                         sc.nextLine();
-                    }
-                    else if(choiceForCategory==2){
+                    } else if (choiceForCategory == 2) {
                         System.out.println("Enter new category name:");
-                        cat = sc.nextLine();
-                        catId=todoTable.insertValuesToCategoryTable(cat);
+                        categoryName = sc.nextLine();
                     }
-                    todoId=todoTable.insertValuesToTodoTable(act,catId);
-                    todoTable.displayExistingTodos();
 
+                    //Enter Tags
                     System.out.println("Enter:\n1 to choose from existing tags\n2 to enter new tag");
-                    int choiceForTags=sc.nextInt();
+                    int choiceForTags;
+                    choiceForTags = sc.nextInt();
                     sc.nextLine();
-                    if(choiceForTags==1){
-                        todoTable.displayExistingTags();
-                        System.out.println("Enter your choice by comma separated id's:");
-                        String tagLine=sc.nextLine();
-                        List<String> tagIdList=Arrays.asList(tagLine.split(","));
-                        for(String tagIds:tagIdList){
-                            todoTable.insertValuesToTodoIdTagIdTable(todoId, Integer.parseInt(tagIds));
+                    if (choiceForTags == 1) {
+                        List<String> tagsList = todoStore.displayExistingTags();
+                        for (String tag : tagsList) {
+                            System.out.println(tag);
                         }
+                        System.out.println("Enter your choice by comma separated id's:");
+                        String tagLine = sc.nextLine();
+                        tagList = Arrays.asList(tagLine.split(","));
+                        tagIdList = new ArrayList<Integer>();
+                        for (String tagid : tagList) {
+                            tagIdList.add(Integer.valueOf(tagid));
+                        }
+                        tagNameList = todoStore.getTags(tagIdList);
+                        System.out.println(tagNameList);
+                        todo = new Todo(act, categoryName, tagNameList, false);
+                        int todoId;
+                        if(choiceForCategory==1){
+                            todoId = todoStore.add(todo, catId,null, tagIdList, null);
+                            todo.setId(todoId);
+                            todoManager.add(todo);
+                        }else{
+                            todoId = todoStore.add(todo, catId,categoryName, tagIdList, null);
+                            todo.setId(todoId);
+                            todoManager.add(todo);
+                        }
+                        todo.setId(todoId);
                     }
-                    else if(choiceForTags==2){
+                    if (choiceForTags == 2) {
                         System.out.println("Enter your choice by comma separated values:");
-                        String tagLine=sc.nextLine();
-                        List<String> tagNameList=Arrays.asList(tagLine.split(","));
-                        for(String tagNames:tagNameList){
-                            int tagIdForNewTag=todoTable.insertValuesToTagTable(tagNames);
-                            todoTable.insertValuesToTodoIdTagIdTable(todoId,tagIdForNewTag);
+                        String tagLine = sc.nextLine();
+                        tagNameList = Arrays.asList(tagLine.split(","));
+                        todo = new Todo(act, categoryName, tagNameList, false);
+                        int todoId;
+                        if(choiceForCategory==1){
+                            todoId = todoStore.add(todo, catId,null, null, tagNameList);
+                            todo.setId(todoId);
+                            todoManager.add(todo);
+                        }
+                        else{
+                            todoId = todoStore.add(todo, catId,categoryName, null, tagNameList);
+                            todo.setId(todoId);
+                            todoManager.add(todo);
                         }
 
                     }
-//                    List<String> tag;
-//                    System.out.println("Enter tags using comma's");
-//                    line = sc.nextLine();
-//                    tag = Arrays.asList(line.split(","));
-//                    Todo todo = new Todo(act, cat, tag, false);
-////                    todo.setId(id);
-//                    todoManager.add(todo);
+                    System.out.println("A new Todo is added");
                     break;
                 case 2:
                     todoManager.displayAll();
+                    List<String> listOfActions = todoStore.displayAllActions();
+                    for (String actions : listOfActions) {
+                        System.out.println(actions);
+                    }
                     System.out.print("Enter id of todo to update: \t");
                     index = sc.nextInt();
                     sc.nextLine();
                     System.out.println("Enter the new Action: \t");
-                    str = sc.nextLine();
-                    todoTable.updateTodo(index,str);
+                    input = sc.nextLine();
+                    todoStore.updateTodo(index, input);
                     try {
-                        todoManager.updateTodo(index, str);
+                        todoManager.updateTodo(index, input);
                     } catch (InvalidIdException e) {
                         System.out.println(e.toString());
                     }
-
                     break;
                 case 3:
                     todoManager.displayAll();
+                    listOfActions = todoStore.displayAllActions();
+                    for (String actions : listOfActions) {
+                        System.out.println(actions);
+                    }
                     System.out.print("Enter id of todo to delete: \t");
                     index = sc.nextInt();
                     sc.nextLine();
@@ -121,24 +141,36 @@ public class TodoConsole {
                     } catch (InvalidIdException e) {
                         System.out.println(e.toString());
                     }
-                    todoTable.deleteTodo(index);
+                    System.out.println(todoStore.deleteTodo(index));
                     break;
                 case 4:
+                    listOfActions = todoStore.displayAllActions();
+                    for (String actions : listOfActions) {
+                        System.out.println(actions);
+                    }
                     System.out.println("Enter index of action to check");
                     index = sc.nextInt();
                     todoManager.completedTodo(index);
                     break;
                 case 5:
                     System.out.println("Enter todo category: \t");
-                    str = sc.nextLine();
-                    todoTable.findByCategory(str);
-//                    todoManager.displayUsingCategory(str);
+                    input = sc.nextLine();
+                    System.out.println("Actions that are related to the category " + input + " are:");
+                    List<String> searchResultListForCategory = todoStore.findByCategory(input);
+                    for (String actions : searchResultListForCategory) {
+                        System.out.println(actions);
+                    }
+                    todoManager.displayUsingCategory(input);
                     break;
                 case 6:
                     System.out.println("Enter todo tag: \t");
-                    str = sc.nextLine();
-                    todoTable.findByTag(str);
-//                    todoManager.displayUsingTags(str);
+                    input = sc.nextLine();
+                    System.out.println("Actions that are related to the tag " + input + " are:");
+                    List<String> searchResultListForTag = todoStore.findByTag(input);
+                    for (String actions : searchResultListForTag) {
+                        System.out.println(actions);
+                    }
+                    todoManager.displayUsingTags(input);
                     break;
                 case 7:
                     System.out.println("completed actions are:");
@@ -146,17 +178,18 @@ public class TodoConsole {
                     break;
                 case 8:
                     System.out.println("Program-");
-//                    todoManager.displayAll();
-//                    todoTable.displayExistingCategories();
-//                    todoTable.displayExistingTags();
-//                    todoTable.displayExistingTodoTagBridge();
-                    todoTable.displayAllActions();
+                    todoManager.displayAll();
+                    System.out.println("TodoStore-");
+                    listOfActions = todoStore.displayAllActions();
+                    for (String actions : listOfActions) {
+                        System.out.println(actions);
+                    }
+                    todoStore.displayExistingTodoTagBridge();
                     break;
                 default:
                     System.out.println("Enter a valid number between 1-8");
 
             }
         }
-
     }
 }

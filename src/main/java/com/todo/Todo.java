@@ -16,6 +16,10 @@ class Todo {
         this.check = check;
     }
 
+    public Todo() {
+
+    }
+
     void setId(int id) {
         this.id = id;
     }

@@ -40,6 +40,7 @@ class TodoManager {
             catIdActionId.put(categoryIdCounter, temp);
             categoryIdCounter++;
         }
+        actionIdCounter++;
         return todo;
     }
 
