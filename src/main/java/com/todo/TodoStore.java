@@ -1,5 +1,4 @@
 package com.todo;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +7,8 @@ import java.util.List;
 class TodoStore {
     private String url = "jdbc:sqlite:test.db";
     private Connection connection;
-
+    List<String> categoryNames = Arrays.asList("work", "travel", "vacation", "daily", "personal");
+    List<String> tags = Arrays.asList("office", "party", "fun", "food", "project");
     private String connectToDatabase() {
         String message = "";
         try {
@@ -72,35 +72,36 @@ class TodoStore {
         }
     }
 
-    int add(Todo todo, int categoryId,String categoryName, List<Integer> tagIdList, List<String> tagNameList) throws SQLException {
+    int add(Todo todo) throws SQLException {
         connection = DriverManager.getConnection(url);
         PreparedStatement preparedStatement;
         ResultSet resultSet;
-        int todoId = 0;
+        int todoId=0;
         //Adding category
-        if (categoryName!=null) {
+        if (!categoryNames.contains(todo.getCategoryName())) {
             String sqlForCategory = "INSERT INTO category (categoryName) VALUES (?)";
             preparedStatement = connection.prepareStatement(sqlForCategory);
-            preparedStatement.setString(1, todo.getCategory());
+            preparedStatement.setString(1, todo.getCategoryName());
             preparedStatement.executeUpdate();
         }
         //Adding todoId,todoName,categoryId to todo
         String sqlForAddingTodo = "INSERT INTO todo (todoName,categoryId) VALUES (?,?)";
         preparedStatement = connection.prepareStatement(sqlForAddingTodo);
         preparedStatement.setString(1, todo.getAction());
-        preparedStatement.setInt(2, categoryId);
+        preparedStatement.setInt(2, todo.getCategoryId());
         preparedStatement.executeUpdate();
         resultSet = preparedStatement.getGeneratedKeys();
         if (resultSet.next()) {
-            todoId = resultSet.getInt(1);
+            todoId=todo.setTodoId(resultSet.getInt(1));
         }
 
         //Adding Tags
         String sqlForTags = "INSERT INTO tags (tagName) VALUES (?)";
         String sqlForTodoTag = "INSERT INTO todoIdTagId (todoId,tagId) VALUES (?,?)";
         int tagId = 0;
-        if (tagNameList != null) {
-            for (String tagName : tagNameList) {
+        for (String tag:todo.getTags()) {
+            if (!tags.contains(tag)) {
+                for (String tagName : todo.getTags()) {
                     preparedStatement = connection.prepareStatement(sqlForTags);
                     preparedStatement.setString(1, tagName);
                     preparedStatement.executeUpdate();
@@ -112,10 +113,11 @@ class TodoStore {
                     preparedStatement.setInt(1, todoId);
                     preparedStatement.setInt(2, tagId);
                     preparedStatement.executeUpdate();
+                }
             }
         }
-        if (tagIdList != null) {
-            for (Integer tagid : tagIdList) {
+        if (todo.getTagIdList() != null) {
+            for (Integer tagid : todo.getTagIdList()) {
                 preparedStatement = connection.prepareStatement(sqlForTodoTag);
                 preparedStatement.setInt(1, todoId);
                 preparedStatement.setInt(2, tagid);
@@ -149,7 +151,6 @@ class TodoStore {
     }
 
     private void existingCategories() throws SQLException {
-        List<String> categoryNames = Arrays.asList("work", "travel", "vacation", "daily", "personal");
         String sqlForCategory = "INSERT INTO category (categoryName) VALUES (?)";
         for (String categoryName : categoryNames) {
             PreparedStatement preparedStatement = connection.prepareStatement(sqlForCategory);
@@ -159,7 +160,6 @@ class TodoStore {
     }
 
     private void existingTags() throws SQLException {
-        List<String> tags = Arrays.asList("office", "party", "fun", "food", "project");
         String sqlForTags = "INSERT INTO tags (tagName) VALUES (?)";
         for (String tagName : tags) {
             PreparedStatement preparedStatement = connection.prepareStatement(sqlForTags);
@@ -299,12 +299,12 @@ class TodoStore {
     }
 
     List<String> displayAllActions() throws SQLException {
-
         List<String> listofActions = new ArrayList<String>();
         String columnValue = "";
         connection = DriverManager.getConnection(url);
-        String statement = "SELECT t.todoId, t.todoName, tags.tagName\n"
+        String statement = "SELECT t.todoId, t.todoName, c.categoryName, tags.tagName\n"
                 + "FROM todo AS t\n"
+                + "JOIN category AS c ON t.categoryId=c.categoryId\n"
                 + "JOIN todoIdTagId AS bridge ON t.todoId=bridge.todoId\n"
                 + "JOIN tags ON bridge.tagId=tags.tagId\n"
                 + "ORDER BY t.todoId";

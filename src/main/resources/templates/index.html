@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:form="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Todo</title>
+    <link th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+<h1>Hello World</h1>
+<table>
+    <tr th:each="todo:${todos}">
+        <td th:text="${todo}"></td>
+    </tr>
+</table>
+
+<form:select path = "tags">
+    <form:option value = "NONE" label = "Select"/>
+    <form:options items = "${tagName}" />
+</form:select>
+
+<form:select path = "categories">
+    <form:option value = "NONE" label = "Select"/>
+    <form:options items = "${categoryName}" />
+</form:select>
+
+</body>
+</html>

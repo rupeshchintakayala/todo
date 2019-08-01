@@ -13,7 +13,7 @@ public class TodoManagerTest {
         todo = todoManager.add(todo);
         boolean match = false;
         for (Todo todo_iterator : todoManager.getTodos()) {
-            if (todo.getId() == todo_iterator.getId()) {
+            if (todo.getTodoId() == todo_iterator.getTodoId()) {
                 match = true;
             }
         }
@@ -27,7 +27,7 @@ public class TodoManagerTest {
         boolean match = false;
         todoManager.updateTodo(0, "Go to Bangalore");
         for (Todo todo_iterator : todoManager.getTodos()) {
-            if (todo_iterator.getId() == (todo.getId())) {
+            if (todo_iterator.getTodoId() == (todo.getTodoId())) {
                 if (todo_iterator.getAction().equals(todo.getAction())) {
                     match = true;
                 }
@@ -57,7 +57,7 @@ public class TodoManagerTest {
         todoManager.deleteTodo(0);
         boolean match = false;
         for (Todo todo_iterator : todoManager.getTodos()) {
-            if (todo_iterator.getId() == todo.getId()) {
+            if (todo_iterator.getTodoId() == todo.getTodoId()) {
                 match = true;
             }
         }
@@ -72,7 +72,7 @@ public class TodoManagerTest {
         String findByCategory = "travel";
         todoManager.displayUsingCategory(findByCategory);
         for (Todo todo_iterator : todoManager.getTodos()) {
-            if (todo_iterator.getCategory().equals(findByCategory)) {
+            if (todo_iterator.getCategoryName().equals(findByCategory)) {
                 if (todo_iterator.getAction().equals(todo.getAction())) {
                     match = true;
                 }

@@ -12,7 +12,7 @@ class TodoManager {
     private Map<Integer, Todo> idToTodoMap = new HashMap<Integer, Todo>();
 
     Todo add(Todo todo) {
-        int actionIdCounter = todo.getId();
+        int actionIdCounter = todo.getTodoId();
         idToTodoMap.put(actionIdCounter, todo);
         for (String tagName : todo.getTags()) {
             if (tagNameId.containsKey(tagName)) {
@@ -28,13 +28,13 @@ class TodoManager {
                 tagIdCounter++;
             }
         }
-        if (catNameId.containsKey(todo.getCategory())) {
-            int index = catNameId.get(todo.getCategory());
+        if (catNameId.containsKey(todo.getCategoryName())) {
+            int index = catNameId.get(todo.getCategoryId());
             List<Integer> temp = catIdActionId.get(index);
             temp.add(actionIdCounter);
             catIdActionId.put(index, temp);
         } else {
-            catNameId.put(todo.getCategory(), categoryIdCounter);
+            catNameId.put(String.valueOf(todo.getCategoryId()), categoryIdCounter);
             List<Integer> temp = new ArrayList<Integer>();
             temp.add(actionIdCounter);
             catIdActionId.put(categoryIdCounter, temp);
@@ -84,7 +84,7 @@ class TodoManager {
 
     void displayAll() {
         for (Todo todo : idToTodoMap.values()) {
-            System.out.println(todo.getId() + "\t\t" + todo.getAction() + "\t\t" + todo.getCategory() + "\t\t" + todo.getTags());
+            System.out.println(todo.getTodoId() + "\t\t" + todo.getAction() + "\t\t" + todo.getCategoryName() + "\t\t" + todo.getTags());
         }
     }
 
@@ -94,7 +94,7 @@ class TodoManager {
 
     void completedTodo(int id) {
         for (Todo todo : idToTodoMap.values()) {
-            if (todo.getId() == id) {
+            if (todo.getTodoId() == id) {
                 todo.check = true;
             }
         }
@@ -103,7 +103,7 @@ class TodoManager {
     void viewCompletedTodos() {
         for (Todo todo : idToTodoMap.values()) {
             if (todo.check) {
-                System.out.println(todo.getId() + "Action: " + todo.getAction() + "\t\tcategory: " + todo.getCategory() + "\t\ttags" + todo.getTags());
+                System.out.println(todo.getTodoId() + "Action: " + todo.getAction() + "\t\tcategory: " + todo.getCategoryId() + "\t\ttags" + todo.getTags());
             }
         }
     }

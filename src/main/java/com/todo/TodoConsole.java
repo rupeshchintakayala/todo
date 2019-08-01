@@ -1,10 +1,7 @@
 package com.todo;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class TodoConsole {
 
@@ -79,15 +76,23 @@ public class TodoConsole {
                         todo = new Todo(act, categoryName, tagNameList, false);
                         int todoId;
                         if(choiceForCategory==1){
-                            todoId = todoStore.add(todo, catId,null, tagIdList, null);
-                            todo.setId(todoId);
+                            todo.setCategoryId(catId);
+                            todo.setCategoryName(todoStore.getCategory(catId));
+                            todo.setTagIdList(tagIdList);
+                            todo.setTags(todoStore.getTags(tagIdList));
+                            todoId = todoStore.add(todo);
+                            todo.setTodoId(todoId);
                             todoManager.add(todo);
                         }else{
-                            todoId = todoStore.add(todo, catId,categoryName, tagIdList, null);
-                            todo.setId(todoId);
+                            todo.setCategoryId(catId);
+                            todo.setCategoryName(categoryName);
+                            todo.setTagIdList(tagIdList);
+                            todo.setTags(todoStore.getTags(tagIdList));
+                            todoId = todoStore.add(todo);
+                            todo.setTodoId(todoId);
                             todoManager.add(todo);
                         }
-                        todo.setId(todoId);
+                        todo.setTodoId(todoId);
                     }
                     if (choiceForTags == 2) {
                         System.out.println("Enter your choice by comma separated values:");
@@ -96,13 +101,21 @@ public class TodoConsole {
                         todo = new Todo(act, categoryName, tagNameList, false);
                         int todoId;
                         if(choiceForCategory==1){
-                            todoId = todoStore.add(todo, catId,null, null, tagNameList);
-                            todo.setId(todoId);
+                            todo.setCategoryId(catId);
+                            todo.setCategoryName(todoStore.getCategory(catId));
+                            todo.setTagIdList(null);
+                            todo.setTags(tagNameList);
+                            todoId = todoStore.add(todo);
+                            todo.setTodoId(todoId);
                             todoManager.add(todo);
                         }
                         else{
-                            todoId = todoStore.add(todo, catId,categoryName, null, tagNameList);
-                            todo.setId(todoId);
+                            todo.setCategoryId(catId);
+                            todo.setCategoryName(categoryName);
+                            todo.setTagIdList(null);
+                            todo.setTags(tagNameList);
+                            todoId = todoStore.add(todo);
+                            todo.setTodoId(todoId);
                             todoManager.add(todo);
                         }
 
@@ -184,6 +197,7 @@ public class TodoConsole {
                     for (String actions : listOfActions) {
                         System.out.println(actions);
                     }
+                    System.out.println(todoStore.displayExistingCategories());
                     todoStore.displayExistingTodoTagBridge();
                     break;
                 default:
