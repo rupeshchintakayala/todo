@@ -79,7 +79,7 @@ public class TodoConsole {
                             todo.setCategoryId(catId);
                             todo.setCategoryName(todoStore.getCategory(catId));
                             todo.setTagIdList(tagIdList);
-                            todo.setTags(todoStore.getTags(tagIdList));
+                            todo.setTagNames(todoStore.getTags(tagIdList));
                             todoId = todoStore.add(todo);
                             todo.setTodoId(todoId);
                             todoManager.add(todo);
@@ -87,7 +87,7 @@ public class TodoConsole {
                             todo.setCategoryId(catId);
                             todo.setCategoryName(categoryName);
                             todo.setTagIdList(tagIdList);
-                            todo.setTags(todoStore.getTags(tagIdList));
+                            todo.setTagNames(todoStore.getTags(tagIdList));
                             todoId = todoStore.add(todo);
                             todo.setTodoId(todoId);
                             todoManager.add(todo);
@@ -104,7 +104,7 @@ public class TodoConsole {
                             todo.setCategoryId(catId);
                             todo.setCategoryName(todoStore.getCategory(catId));
                             todo.setTagIdList(null);
-                            todo.setTags(tagNameList);
+                            todo.setTagNames(tagNameList);
                             todoId = todoStore.add(todo);
                             todo.setTodoId(todoId);
                             todoManager.add(todo);
@@ -113,7 +113,7 @@ public class TodoConsole {
                             todo.setCategoryId(catId);
                             todo.setCategoryName(categoryName);
                             todo.setTagIdList(null);
-                            todo.setTags(tagNameList);
+                            todo.setTagNames(tagNameList);
                             todoId = todoStore.add(todo);
                             todo.setTodoId(todoId);
                             todoManager.add(todo);

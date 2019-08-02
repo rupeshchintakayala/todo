@@ -6,17 +6,17 @@ class Todo {
     private int todoId;
     private int categoryId;
     private List<Integer> tagId;
-    private String action;
+    private String todoName;
     private String categoryName;
-    private List<String> tags;
+    private List<String> tagNames;
     private List<Integer> tagIdList;
 
     boolean check;
 
     Todo(String act, String cat, List<String> tag, boolean check) {
-        action = act;
+        todoName = act;
         categoryName = cat;
-        tags = tag;
+        tagNames = tag;
         this.check = check;
     }
 
@@ -24,13 +24,13 @@ class Todo {
 
     }
 
-    public Todo(int todoId, int categoryId, List<Integer> tagId, String action, String categoryName, List<String> tags, List<Integer> tagIdList, boolean check) {
+    public Todo(int todoId, int categoryId, List<Integer> tagId, String todoName, String categoryName, List<String> tagNames, List<Integer> tagIdList, boolean check) {
         this.todoId = todoId;
         this.categoryId = categoryId;
         this.tagId = tagId;
-        this.action = action;
+        this.todoName = todoName;
         this.categoryName = categoryName;
-        this.tags = tags;
+        this.tagNames = tagNames;
         this.tagIdList = tagIdList;
         this.check = check;
     }
@@ -60,8 +60,8 @@ class Todo {
         this.categoryName = categoryName;
     }
 
-    public void setTags(List<String> tags) {
-        this.tags = tags;
+    public void setTagNames(List<String> tagNames) {
+        this.tagNames = tagNames;
     }
 
     public List<Integer> getTagIdList() {
@@ -85,16 +85,16 @@ class Todo {
         return todoId;
     }
 
-    void setAction(String act) {
-        action = act;
+    void setTodoName(String act) {
+        todoName = act;
     }
 
-    String getAction() {
-        return action;
+    String getTodoName() {
+        return todoName;
     }
 
-    List<String> getTags() {
-        return tags;
+    List<String> getTagNames() {
+        return tagNames;
     }
 
     int getTodoId() {

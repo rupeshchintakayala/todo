@@ -1,11 +1,9 @@
 package com.todo;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 class TodoStore {
@@ -111,7 +109,7 @@ class TodoStore {
         }
         String sqlForAddingTodo = "INSERT INTO todo (todoName,categoryId) VALUES (?,?)";
         preparedStatement = connection.prepareStatement(sqlForAddingTodo);
-        preparedStatement.setString(1, todo.getAction());
+        preparedStatement.setString(1, todo.getTodoName());
         preparedStatement.setInt(2, categoryId);
         preparedStatement.executeUpdate();
         resultSet = preparedStatement.getGeneratedKeys();
@@ -122,7 +120,7 @@ class TodoStore {
         String sqlForTags = "INSERT INTO tags (tagName) VALUES (?)";
         String sqlForTodoTag = "INSERT INTO todoIdTagId (todoId,tagId) VALUES (?,?)";
         int tagId = 0;
-        for (String tagName : todo.getTags()) {
+        for (String tagName : todo.getTagNames()) {
             if (!tags.contains(tagName)) {
                 tags.add(tagName);
                 preparedStatement = connection.prepareStatement(sqlForTags);

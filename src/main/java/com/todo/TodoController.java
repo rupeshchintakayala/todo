@@ -1,14 +1,13 @@
 package com.todo;
 
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/")
@@ -36,16 +35,15 @@ public class TodoController {
         return categories;
     }
 
-    @PostMapping("/addTodo")
-    public String handlePostRequest(Todo todo) throws SQLException {
-        todoStore.add(todo);
-        return "redirect:/addTodo";
+    @GetMapping("/addTodo")
+    public String getTodo(Model model) {
+        model.addAttribute("todo", new Todo());
+        return "todo";
     }
 
-    @GetMapping("/addTodo")
-    public String handleGetRequest(Model model) {
-        model.addAttribute("todos", todos);
-        return "redirect:/all";
+    @PostMapping("/addTodo")
+    public String todoSubmit(@ModelAttribute Todo todo) {
+        return "result";
     }
 
 }
