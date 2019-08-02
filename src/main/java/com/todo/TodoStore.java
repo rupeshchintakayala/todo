@@ -1,4 +1,8 @@
 package com.todo;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,8 +11,9 @@ import java.util.List;
 class TodoStore {
     private String url = "jdbc:sqlite:test.db";
     private Connection connection;
-    List<String> categoryNames = Arrays.asList("work", "travel", "vacation", "daily", "personal");
-    List<String> tags = Arrays.asList("office", "party", "fun", "food", "project");
+    private List<String> categoryNames = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
+
     private String connectToDatabase() {
         String message = "";
         try {
@@ -30,6 +35,16 @@ class TodoStore {
 
     //TodoStore Section//
     String initialize() throws SQLException {
+        categoryNames.add("work");
+        categoryNames.add("travel");
+        categoryNames.add("vacation");
+        categoryNames.add("daily");
+        categoryNames.add("personal");
+        tags.add("office");
+        tags.add("party");
+        tags.add("fun");
+        tags.add("food");
+        tags.add("project");
         dropTable("todo");
         dropTable("tags");
         dropTable("category");
@@ -76,44 +91,51 @@ class TodoStore {
         connection = DriverManager.getConnection(url);
         PreparedStatement preparedStatement;
         ResultSet resultSet;
-        int todoId=0;
+        int todoId = 0;
+        int categoryId=0;
         //Adding category
         if (!categoryNames.contains(todo.getCategoryName())) {
+            categoryNames.add(todo.getCategoryName());
             String sqlForCategory = "INSERT INTO category (categoryName) VALUES (?)";
             preparedStatement = connection.prepareStatement(sqlForCategory);
             preparedStatement.setString(1, todo.getCategoryName());
             preparedStatement.executeUpdate();
+            resultSet = preparedStatement.getGeneratedKeys();
+            if (resultSet.next()) {
+                categoryId = todo.setCategoryId(resultSet.getInt(1));
+            }
         }
         //Adding todoId,todoName,categoryId to todo
+        if(categoryId==0){
+            categoryId=todo.getCategoryId();
+        }
         String sqlForAddingTodo = "INSERT INTO todo (todoName,categoryId) VALUES (?,?)";
         preparedStatement = connection.prepareStatement(sqlForAddingTodo);
         preparedStatement.setString(1, todo.getAction());
-        preparedStatement.setInt(2, todo.getCategoryId());
+        preparedStatement.setInt(2, categoryId);
         preparedStatement.executeUpdate();
         resultSet = preparedStatement.getGeneratedKeys();
         if (resultSet.next()) {
-            todoId=todo.setTodoId(resultSet.getInt(1));
+            todoId = todo.setTodoId(resultSet.getInt(1));
         }
-
         //Adding Tags
         String sqlForTags = "INSERT INTO tags (tagName) VALUES (?)";
         String sqlForTodoTag = "INSERT INTO todoIdTagId (todoId,tagId) VALUES (?,?)";
         int tagId = 0;
-        for (String tag:todo.getTags()) {
-            if (!tags.contains(tag)) {
-                for (String tagName : todo.getTags()) {
-                    preparedStatement = connection.prepareStatement(sqlForTags);
-                    preparedStatement.setString(1, tagName);
-                    preparedStatement.executeUpdate();
-                    resultSet = preparedStatement.getGeneratedKeys();
-                    if (resultSet.next()) {
-                        tagId = resultSet.getInt(1);
-                    }
-                    preparedStatement = connection.prepareStatement(sqlForTodoTag);
-                    preparedStatement.setInt(1, todoId);
-                    preparedStatement.setInt(2, tagId);
-                    preparedStatement.executeUpdate();
+        for (String tagName : todo.getTags()) {
+            if (!tags.contains(tagName)) {
+                tags.add(tagName);
+                preparedStatement = connection.prepareStatement(sqlForTags);
+                preparedStatement.setString(1, tagName);
+                preparedStatement.executeUpdate();
+                resultSet = preparedStatement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    tagId = resultSet.getInt(1);
                 }
+                preparedStatement = connection.prepareStatement(sqlForTodoTag);
+                preparedStatement.setInt(1, todoId);
+                preparedStatement.setInt(2, tagId);
+                preparedStatement.executeUpdate();
             }
         }
         if (todo.getTagIdList() != null) {
@@ -339,5 +361,38 @@ class TodoStore {
             }
             System.out.println("");
         }
+    }
+
+    List<JSONObject> getJSON(String choice) throws SQLException {
+        connection = DriverManager.getConnection(url);
+        String statement = " ";
+        if (choice.equals("all")) {
+            statement = "SELECT t.todoId, t.todoName, c.categoryName, tags.tagName\n"
+                    + "FROM todo AS t\n"
+                    + "JOIN category AS c ON t.categoryId=c.categoryId\n"
+                    + "JOIN todoIdTagId AS bridge ON t.todoId=bridge.todoId\n"
+                    + "JOIN tags ON bridge.tagId=tags.tagId\n"
+                    + "ORDER BY t.todoId";
+        }
+        if (choice.equals("category")) {
+            statement = "SELECT * from category";
+        }
+        if (choice.equals("tags")) {
+            statement = "SELECT * from tags";
+        }
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        String jsonString = "";
+        JSONObject jsonobject = null;
+        List<JSONObject> jsonObjectsList = new ArrayList<>();
+        while (resultSet.next()) {
+            jsonobject = new JSONObject();
+            for (int i = 0; i < resultSetMetaData.getColumnCount(); i++) {
+                jsonobject.put(resultSetMetaData.getColumnLabel(i + 1), resultSet.getObject(i + 1));
+            }
+            jsonObjectsList.add(jsonobject);
+        }
+        return jsonObjectsList;
     }
 }

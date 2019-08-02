@@ -39,8 +39,9 @@ class Todo {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public int setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+        return categoryId;
     }
 
     public List<Integer> getTagId() {
