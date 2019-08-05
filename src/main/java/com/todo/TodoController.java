@@ -33,8 +33,13 @@ public class TodoController {
 
     @PostMapping
     public Todo todoSubmit(@RequestBody Map<String,String> data) throws SQLException {
-        Todo todo=new Todo(data.get("todoName"),data.get("categoryName"), Arrays.asList(data.get("tags").split(",")),false);
+        List<Integer> tagIdList=new ArrayList<>();
+        String categoryName=todoStore.getCategoryName(Integer.parseInt(data.get("categoryId")));
+        Todo todo=new Todo(data.get("todoName"),categoryName, Arrays.asList(data.get("tags").split(",")),false);
         todoStore.add(todo);
+        for (String tag: Arrays.asList(data.get("tags").split(","))) {
+            tagIdList.add(todoStore.getTagId(tag));
+        }
         return todo;
     }
 

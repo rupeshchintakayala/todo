@@ -135,10 +135,7 @@ class TodoStore {
                 if (resultSet.next()) {
                     tagId = resultSet.getInt(1);
                 }
-                preparedStatement = connection.prepareStatement(sqlForTodoTag);
-                preparedStatement.setInt(1, todoId);
-                preparedStatement.setInt(2, tagId);
-                preparedStatement.executeUpdate();
+                tagIdList.add(tagId);
             }
         }
         todo.setTagIdList(tagIdList);
@@ -153,17 +150,23 @@ class TodoStore {
         return todoId;
     }
 
-    int deleteTodo(int id) throws SQLException {
+    int deleteTodo(int todoId) throws SQLException {
         int reference = 0;
         connection = DriverManager.getConnection(url);
         String statement = "DELETE FROM todo WHERE todoId=?";
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
-        preparedStatement.setInt(1, id);
+        preparedStatement.setInt(1, todoId);
         preparedStatement.executeUpdate();
         ResultSet resultSet = preparedStatement.getGeneratedKeys();
         if (resultSet.next()) {
             reference = resultSet.getInt(1);
         }
+
+        statement = "DELETE FROM todoIdTagId WHERE todoId=?";
+        preparedStatement = connection.prepareStatement(statement);
+        preparedStatement.setInt(1, todoId);
+        preparedStatement.executeUpdate();
+
         return reference;
     }
 
@@ -423,7 +426,7 @@ class TodoStore {
         connection = DriverManager.getConnection(url);
         String statement = " ";
         if (choice.equals("all")) {
-            statement = "SELECT t.todoId, t.todoName, c.categoryName, tags.tagName\n"
+            statement = "SELECT  t.todoId, t.todoName, c.categoryId, c.categoryName, tags.tagId, tags.tagName\n"
                     + "FROM todo AS t\n"
                     + "JOIN category AS c ON t.categoryId=c.categoryId\n"
                     + "JOIN todoIdTagId AS bridge ON t.todoId=bridge.todoId\n"
@@ -439,8 +442,7 @@ class TodoStore {
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
         ResultSet resultSet = preparedStatement.executeQuery();
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-        String jsonString = "";
-        JSONObject jsonobject = null;
+        JSONObject jsonobject;
         List<JSONObject> jsonObjectsList = new ArrayList<>();
         while (resultSet.next()) {
             jsonobject = new JSONObject();

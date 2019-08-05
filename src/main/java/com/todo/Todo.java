@@ -5,7 +5,6 @@ import java.util.*;
 class Todo {
     private int todoId;
     private int categoryId;
-    private List<Integer> tagId;
     private String todoName;
     private String categoryName;
     private List<String> tagNames;
@@ -24,10 +23,9 @@ class Todo {
 
     }
 
-    public Todo(int todoId, int categoryId, List<Integer> tagId, String todoName, String categoryName, List<String> tagNames, List<Integer> tagIdList, boolean check) {
+    public Todo(int todoId, int categoryId, String todoName, String categoryName, List<String> tagNames, List<Integer> tagIdList, boolean check) {
         this.todoId = todoId;
         this.categoryId = categoryId;
-        this.tagId = tagId;
         this.todoName = todoName;
         this.categoryName = categoryName;
         this.tagNames = tagNames;
@@ -42,14 +40,6 @@ class Todo {
     public int setCategoryId(int categoryId) {
         this.categoryId = categoryId;
         return categoryId;
-    }
-
-    public List<Integer> getTagId() {
-        return tagId;
-    }
-
-    public void setTagId(List<Integer> tagId) {
-        this.tagId = tagId;
     }
 
     public String getCategoryName() {
@@ -89,15 +79,15 @@ class Todo {
         todoName = act;
     }
 
-    String getTodoName() {
+    public String getTodoName() {
         return todoName;
     }
 
-    List<String> getTagNames() {
+    public List<String> getTagNames() {
         return tagNames;
     }
 
-    int getTodoId() {
+    public int getTodoId() {
         return todoId;
     }
 }
