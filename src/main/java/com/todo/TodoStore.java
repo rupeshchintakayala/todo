@@ -92,7 +92,7 @@ class TodoStore {
         int todoId = 0;
         int categoryId=0;
         //Adding category
-        if (!categoryNames.contains(todo.getCategoryName())) {
+        if (!hasCategory(todo.getCategoryName())) {
             categoryNames.add(todo.getCategoryName());
             String sqlForCategory = "INSERT INTO category (categoryName) VALUES (?)";
             preparedStatement = connection.prepareStatement(sqlForCategory);
@@ -103,9 +103,9 @@ class TodoStore {
                 categoryId = todo.setCategoryId(resultSet.getInt(1));
             }
         }
-        //Adding todoId,todoName,categoryId to todo
         if(categoryId==0){
-            categoryId=todo.getCategoryId();
+            categoryId=getCategoryId(todo.getCategoryName());
+            todo.setCategoryId(categoryId);
         }
         String sqlForAddingTodo = "INSERT INTO todo (todoName,categoryId) VALUES (?,?)";
         preparedStatement = connection.prepareStatement(sqlForAddingTodo);
@@ -119,9 +119,9 @@ class TodoStore {
         //Adding Tags
         String sqlForTags = "INSERT INTO tags (tagName) VALUES (?)";
         String sqlForTodoTag = "INSERT INTO todoIdTagId (todoId,tagId) VALUES (?,?)";
-        int tagId = 0;
         for (String tagName : todo.getTagNames()) {
-            if (!tags.contains(tagName)) {
+            int tagId = 0;
+            if (!hasTag(tagName)) {
                 tags.add(tagName);
                 preparedStatement = connection.prepareStatement(sqlForTags);
                 preparedStatement.setString(1, tagName);
@@ -130,11 +130,14 @@ class TodoStore {
                 if (resultSet.next()) {
                     tagId = resultSet.getInt(1);
                 }
-                preparedStatement = connection.prepareStatement(sqlForTodoTag);
-                preparedStatement.setInt(1, todoId);
-                preparedStatement.setInt(2, tagId);
-                preparedStatement.executeUpdate();
             }
+            if(tagId==0){
+                tagId=getTagId(tagName);
+            }
+            preparedStatement = connection.prepareStatement(sqlForTodoTag);
+            preparedStatement.setInt(1, todoId);
+            preparedStatement.setInt(2, tagId);
+            preparedStatement.executeUpdate();
         }
         if (todo.getTagIdList() != null) {
             for (Integer tagid : todo.getTagIdList()) {
@@ -194,12 +197,38 @@ class TodoStore {
         preparedStatement.executeUpdate();
     }
 
-    String getCategory(int id) throws SQLException {
+    boolean hasCategory(String categoryName) throws SQLException {
+        boolean check=false;
+        if(getCategoryId(categoryName)>0){
+            check=true;
+        }
+        return check;
+    }
+
+    int getCategoryId(String categoryName) throws SQLException {
+        int categoryId = 0;
+        connection = DriverManager.getConnection(url);
+        String statement = "SELECT categoryId FROM category WHERE categoryName=?";
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        preparedStatement.setString(1, categoryName);
+        preparedStatement.executeQuery();
+        ResultSet resultSet = preparedStatement.executeQuery();
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        int columnsNumber = resultSetMetaData.getColumnCount();
+        while (resultSet.next()) {
+            for (int i = 1; i <= columnsNumber; i++) {
+                categoryId = Integer.parseInt(resultSet.getString(i));
+            }
+        }
+        return categoryId;
+    }
+
+    String getCategoryName(int categoryId) throws SQLException {
         String categoryName = "";
         connection = DriverManager.getConnection(url);
         String statement = "SELECT categoryName FROM category WHERE categoryId=?";
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
-        preparedStatement.setInt(1, id);
+        preparedStatement.setInt(1, categoryId);
         preparedStatement.executeQuery();
         ResultSet resultSet = preparedStatement.executeQuery();
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -210,6 +239,32 @@ class TodoStore {
             }
         }
         return categoryName;
+    }
+
+    boolean hasTag(String tagName) throws SQLException {
+        boolean check=false;
+        if(getTagId(tagName)>0){
+            check=true;
+        }
+        return check;
+    }
+
+    int getTagId(String tagName) throws SQLException {
+        int tagId = 0;
+        connection = DriverManager.getConnection(url);
+        String statement = "SELECT tagId FROM tags WHERE tagName=?";
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        preparedStatement.setString(1, tagName);
+        preparedStatement.executeQuery();
+        ResultSet resultSet = preparedStatement.executeQuery();
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        int columnsNumber = resultSetMetaData.getColumnCount();
+        while (resultSet.next()) {
+            for (int i = 1; i <= columnsNumber; i++) {
+                tagId = Integer.parseInt(resultSet.getString(i));
+            }
+        }
+        return tagId;
     }
 
     List<String> getTags(List<Integer> id) throws SQLException {

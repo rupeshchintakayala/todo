@@ -47,7 +47,7 @@ public class TodoConsole {
                             System.out.println(category);
                         }
                         catId = sc.nextInt();
-                        categoryName = todoStore.getCategory(catId);
+                        categoryName = todoStore.getCategoryName(catId);
                         sc.nextLine();
                     } else if (choiceForCategory == 2) {
                         System.out.println("Enter new category name:");
@@ -77,7 +77,7 @@ public class TodoConsole {
                         int todoId;
                         if(choiceForCategory==1){
                             todo.setCategoryId(catId);
-                            todo.setCategoryName(todoStore.getCategory(catId));
+                            todo.setCategoryName(todoStore.getCategoryName(catId));
                             todo.setTagIdList(tagIdList);
                             todo.setTagNames(todoStore.getTags(tagIdList));
                             todoId = todoStore.add(todo);
@@ -102,7 +102,7 @@ public class TodoConsole {
                         int todoId;
                         if(choiceForCategory==1){
                             todo.setCategoryId(catId);
-                            todo.setCategoryName(todoStore.getCategory(catId));
+                            todo.setCategoryName(todoStore.getCategoryName(catId));
                             todo.setTagIdList(null);
                             todo.setTagNames(tagNameList);
                             todoId = todoStore.add(todo);
@@ -118,7 +118,6 @@ public class TodoConsole {
                             todo.setTodoId(todoId);
                             todoManager.add(todo);
                         }
-
                     }
                     System.out.println("A new Todo is added");
                     break;

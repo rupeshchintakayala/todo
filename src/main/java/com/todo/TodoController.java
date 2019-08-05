@@ -1,23 +1,19 @@
 package com.todo;
 
-import org.springframework.ui.Model;
+import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
+
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import java.util.*;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/todos")
 public class TodoController {
 
     private TodoStore todoStore=new TodoStore();
 
     private List<String> todos = new ArrayList<>();
-
-    @GetMapping("/all")
+    @GetMapping
     public String getAllActions() throws SQLException {
         String todos = String.valueOf(todoStore.getJSON("all"));
         return todos;
@@ -35,15 +31,22 @@ public class TodoController {
         return categories;
     }
 
-    @GetMapping("/addTodo")
-    public String getTodo(Model model) {
-        model.addAttribute("todo", new Todo());
-        return "todo";
+    @PostMapping
+    public Todo todoSubmit(@RequestBody Map<String,String> data) throws SQLException {
+        Todo todo=new Todo(data.get("todoName"),data.get("categoryName"), Arrays.asList(data.get("tags").split(",")),false);
+        todoStore.add(todo);
+        return todo;
     }
 
-    @PostMapping("/addTodo")
-    public String todoSubmit(@ModelAttribute Todo todo) {
-        return "result";
+    @DeleteMapping("/{todoId}")
+    public String deleteTodo(@PathVariable("todoId") int todoId) throws SQLException {
+        todoStore.deleteTodo(todoId);
+        return "Todo Deleted";
     }
 
+    @PutMapping("/{todoId}")
+    public String update(@RequestBody Map<String,String> data,@PathVariable("todoId") int todoId) throws SQLException {
+        todoStore.updateTodo(todoId,data.get("todoName"));
+        return "Todo Updated";
+    }
 }
