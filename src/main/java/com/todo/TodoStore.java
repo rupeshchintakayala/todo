@@ -119,8 +119,13 @@ class TodoStore {
         //Adding Tags
         String sqlForTags = "INSERT INTO tags (tagName) VALUES (?)";
         String sqlForTodoTag = "INSERT INTO todoIdTagId (todoId,tagId) VALUES (?,?)";
+        List<Integer> tagIdList = new ArrayList<>();
         for (String tagName : todo.getTagNames()) {
-            int tagId = 0;
+            int tagId=0;
+            if(hasTag(tagName)){
+                tagId=getTagId(tagName);
+                tagIdList.add(tagId);
+            }
             if (!hasTag(tagName)) {
                 tags.add(tagName);
                 preparedStatement = connection.prepareStatement(sqlForTags);
@@ -130,15 +135,13 @@ class TodoStore {
                 if (resultSet.next()) {
                     tagId = resultSet.getInt(1);
                 }
+                preparedStatement = connection.prepareStatement(sqlForTodoTag);
+                preparedStatement.setInt(1, todoId);
+                preparedStatement.setInt(2, tagId);
+                preparedStatement.executeUpdate();
             }
-            if(tagId==0){
-                tagId=getTagId(tagName);
-            }
-            preparedStatement = connection.prepareStatement(sqlForTodoTag);
-            preparedStatement.setInt(1, todoId);
-            preparedStatement.setInt(2, tagId);
-            preparedStatement.executeUpdate();
         }
+        todo.setTagIdList(tagIdList);
         if (todo.getTagIdList() != null) {
             for (Integer tagid : todo.getTagIdList()) {
                 preparedStatement = connection.prepareStatement(sqlForTodoTag);
