@@ -54,4 +54,17 @@ public class TodoController {
         todoStore.updateTodo(todoId,data.get("todoName"));
         return "Todo Updated";
     }
+
+    @GetMapping("/findByCategory")
+    public String findByCategory(@RequestBody Map<String,String> data) throws SQLException {
+        String searchResultsForCategory= String.valueOf(todoStore.getJSONForSearch("findByCategory",todoStore.getCategoryName(Integer.parseInt(data.get("categoryId")))));
+        return searchResultsForCategory;
+    }
+
+    @GetMapping("/findByTag")
+    public String findByTag(@RequestBody Map<String,String> data) throws SQLException {
+        String searchResultsForTag= String.valueOf(todoStore.getJSONForSearch("findByTag",todoStore.getTagName(Integer.parseInt(data.get("tagId")))));
+        return searchResultsForTag;
+    }
+
 }

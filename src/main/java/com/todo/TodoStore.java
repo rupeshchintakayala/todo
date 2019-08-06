@@ -273,6 +273,24 @@ class TodoStore {
         return tagId;
     }
 
+    String getTagName(int tagId) throws SQLException {
+        String tagName = "";
+        connection = DriverManager.getConnection(url);
+        String statement = "SELECT tagName FROM tags WHERE tagId=?";
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        preparedStatement.setInt(1, tagId);
+        preparedStatement.executeQuery();
+        ResultSet resultSet = preparedStatement.executeQuery();
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        int columnsNumber = resultSetMetaData.getColumnCount();
+        while (resultSet.next()) {
+            for (int i = 1; i <= columnsNumber; i++) {
+                tagName = resultSet.getString(i);
+            }
+        }
+        return tagName;
+    }
+
     List<String> getTags(List<Integer> id) throws SQLException {
         String columnValue = "";
         ResultSet resultSet;
@@ -440,6 +458,45 @@ class TodoStore {
             statement = "SELECT * from tags";
         }
         PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        JSONObject jsonobject;
+        List<JSONObject> jsonObjectsList = new ArrayList<>();
+        while (resultSet.next()) {
+            jsonobject = new JSONObject();
+            for (int i = 0; i < resultSetMetaData.getColumnCount(); i++) {
+                jsonobject.put(resultSetMetaData.getColumnLabel(i + 1), resultSet.getObject(i + 1));
+            }
+            jsonObjectsList.add(jsonobject);
+        }
+        return jsonObjectsList;
+    }
+
+    List<JSONObject> getJSONForSearch(String choice,String searchInput) throws SQLException {
+        connection = DriverManager.getConnection(url);
+        String statement = " ";
+        PreparedStatement preparedStatement=null;
+        if (choice.equals("findByCategory")) {
+            statement = "SELECT  t.todoId, t.todoName, c.categoryId, c.categoryName, tags.tagId, tags.tagName\n"
+                    + "FROM todo AS t\n"
+                    + "INNER JOIN category AS c ON t.categoryId=c.categoryId AND categoryName=?\n"
+                    + "JOIN todoIdTagId AS bridge ON t.todoId=bridge.todoId\n"
+                    + "JOIN tags ON bridge.tagId=tags.tagId\n"
+                    + "ORDER BY t.todoId";
+            preparedStatement = connection.prepareStatement(statement);
+            preparedStatement.setString(1,searchInput);
+        }
+        if (choice.equals("findByTag")) {
+            statement = "SELECT  t.todoId, t.todoName, c.categoryId, c.categoryName, tags.tagId, tags.tagName\n"
+                    + "FROM todo AS t\n"
+                    + "JOIN category AS c ON t.categoryId=c.categoryId\n"
+                    + "JOIN todoIdTagId AS bridge ON t.todoId=bridge.todoId\n"
+                    + "JOIN tags ON bridge.tagId=tags.tagId AND tags.tagName=?\n"
+                    + "ORDER BY t.todoId";
+            preparedStatement = connection.prepareStatement(statement);
+            preparedStatement.setString(1,searchInput);
+        }
+
         ResultSet resultSet = preparedStatement.executeQuery();
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         JSONObject jsonobject;
