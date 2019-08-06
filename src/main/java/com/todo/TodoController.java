@@ -32,14 +32,8 @@ public class TodoController {
     }
 
     @PostMapping
-    public Todo todoSubmit(@RequestBody Map<String,String> data) throws SQLException {
-        List<Integer> tagIdList=new ArrayList<>();
-        String categoryName=todoStore.getCategoryName(Integer.parseInt(data.get("categoryId")));
-        Todo todo=new Todo(data.get("todoName"),categoryName, Arrays.asList(data.get("tags").split(",")),false);
+    public Todo todoSubmit(@RequestBody Todo todo) throws SQLException {
         todoStore.add(todo);
-        for (String tag: Arrays.asList(data.get("tags").split(","))) {
-            tagIdList.add(todoStore.getTagId(tag));
-        }
         return todo;
     }
 
@@ -56,14 +50,14 @@ public class TodoController {
     }
 
     @GetMapping("/findByCategory")
-    public String findByCategory(@RequestBody Map<String,String> data) throws SQLException {
-        String searchResultsForCategory= String.valueOf(todoStore.getJSONForSearch("findByCategory",todoStore.getCategoryName(Integer.parseInt(data.get("categoryId")))));
+    public String findByCategory(@RequestBody Search search) throws SQLException {
+        String searchResultsForCategory= String.valueOf(todoStore.getJSONForSearch(search.getType(),search.getQuery()));
         return searchResultsForCategory;
     }
 
     @GetMapping("/findByTag")
-    public String findByTag(@RequestBody Map<String,String> data) throws SQLException {
-        String searchResultsForTag= String.valueOf(todoStore.getJSONForSearch("findByTag",todoStore.getTagName(Integer.parseInt(data.get("tagId")))));
+    public String findByTag(@RequestBody Search search) throws SQLException {
+        String searchResultsForTag= String.valueOf(todoStore.getJSONForSearch(search.getType(),search.getQuery()));
         return searchResultsForTag;
     }
 
